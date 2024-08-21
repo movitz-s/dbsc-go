@@ -27,6 +27,25 @@ type RegistrationClaims struct {
 	IssuedAt      jwt.NumericDate `json:"iat"`
 }
 
+func (c RegistrationClaims) GetExpirationTime() (*jwt.NumericDate, error) {
+
+}
+func (c RegistrationClaims) GetIssuedAt() (*jwt.NumericDate, error) {
+
+}
+func (c RegistrationClaims) GetNotBefore() (*jwt.NumericDate, error) {
+
+}
+func (c RegistrationClaims) GetIssuer() (string, error) {
+
+}
+func (c RegistrationClaims) GetSubject() (string, error) {
+
+}
+func (c RegistrationClaims) GetAudience() (jwt.ClaimStrings, error) {
+
+}
+
 type ChallengeResponseClaims struct {
 	// nonce
 	JWTID    string `json:"jti"`
@@ -94,4 +113,16 @@ type ChallengeHeaderConfig struct {
 
 func ChallengeHeader(cfg ChallengeHeaderConfig) string {
 	return fmt.Sprintf(`session_id="%s",challenge="%s"`, cfg.SessionID, cfg.Challenge)
+}
+
+func ParseRegistrationJWT(token string) (*jwt.Token, error) {
+
+	dbscKeyFunc := func(t *jwt.Token) (interface{}, error) {
+		return []byte(t.Claims.(RegistrationClaims).Key), nil
+	}
+
+	return jwt.NewParser(
+		jwt.WithValidMethods([]string{AlgES256, AlgRS256}),
+		jwt.WithStrictDecoding(),
+	).ParseWithClaims(token, &RegistrationClaims{}, dbscKeyFunc)
 }
